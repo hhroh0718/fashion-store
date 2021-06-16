@@ -1,0 +1,11 @@
+fashionstore\Shipped.class
+fashionstore\DeliveryCancelled.class
+fashionstore\Ordered.class
+fashionstore\config\kafka\KafkaProcessor.class
+fashionstore\PolicyHandler.class
+fashionstore\AbstractEvent$1.class
+fashionstore\CustomercenterApplication.class
+fashionstore\Dashboard.class
+fashionstore\DashboardRepository.class
+fashionstore\DashboardViewHandler.class
+fashionstore\AbstractEvent.class
