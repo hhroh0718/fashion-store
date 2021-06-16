@@ -1,0 +1,15 @@
+fashionstore\Shipped.class
+fashionstore\CancellationRepository.class
+fashionstore\CancellationController.class
+fashionstore\OrderCancelled.class
+fashionstore\Cancellation.class
+fashionstore\DeliveryCancelled.class
+fashionstore\Ordered.class
+fashionstore\config\kafka\KafkaProcessor.class
+fashionstore\PolicyHandler.class
+fashionstore\AbstractEvent$1.class
+fashionstore\DeliveryRepository.class
+fashionstore\DeliveryApplication.class
+fashionstore\DeliveryController.class
+fashionstore\Delivery.class
+fashionstore\AbstractEvent.class
