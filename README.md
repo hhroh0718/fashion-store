@@ -327,47 +327,156 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
 
 **Order 서비스 내 external.PaymentService**
 
-package fashionstore.external;
+    package fashionstore.external;
+    
+    import org.springframework.cloud.openfeign.FeignClient;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RequestMethod;
+    import org.springframework.web.bind.annotation.RequestParam;
+    
+    import java.util.Date;
+    
+    @FeignClient(name="payment", url="http://localhost:8085")
+    public interface PaymentService {
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+       @RequestMapping(method= RequestMethod.GET, path="/requestPayment")
+       public boolean pay(@RequestParam("orderId") Long id, @RequestParam("price") Long price);
+    }
 
-import java.util.Date;
+**주문 생성 직후(@PostPersist) 결제를 요청하도록 처리 Order.java Entity Class 내 추가**
 
-@FeignClient(name="payment", url="http://localhost:8085")
-public interface PaymentService {
+    @PostPersist
+    public void onPostPersist(){
+      boolean rslt = OrderApplication.applicationContext.getBean(fashionstore.external.PaymentService.class)
+                .pay(this.getId(), this.getPrice());
+      if (rslt) {
+         Ordered ordered = new Ordered();
+         BeanUtils.copyProperties(this, ordered);
+         ordered.publishAfterCommit();
+        }
+    }
+ 
+동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
+잠시 Payment 서비스 중지
+<이미지>
 
-    @RequestMapping(method= RequestMethod.GET, path="/requestPayment")
-    public boolean pay(@RequestParam("orderId") Long id, @RequestParam("price") Long price);
+주문 수행 시 오류 발생
 
-}
+    C:\Users\Administrator>http POST http://localhost:8088/orders productId="4000" size="S" qty=1 price=50000
+    HTTP/1.1 500 Internal Server Error
+    Content-Type: application/json;charset=UTF-8
+    Date: Thu, 17 Jun 2021 15:31:35 GMT
+    transfer-encoding: chunked
+    {
+      "error": "Internal Server Error",
+      "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
+      "path": "/orders",
+      "status": 500,
+      "timestamp": "2021-06-17T15:31:35.001+0000"
+    }
 
-주문 생성 직후(@PostPersist) 결제를 요청하도록 처리 Order.java Entity Class 내 추가
+결제 서비스 구동
 
-**동작 확인**
+    C:\Users\Administrator\Documents\MSA교육자료\fashion-store-main\fashion-store-main\payment>mvn spring-boot:run
 
-잠시 Delivery 서비스 중지
-![증빙7](https://github.com/bigot93/forthcafe/blob/main/images/%EB%8F%99%EA%B8%B0%ED%99%941.png)
+주문 재수행 - 정상처리됨을 확인
 
-주문 취소 요청시 Pay 서비스 변화 없음
-![증빙8](https://github.com/bigot93/forthcafe/blob/main/images/%EB%8F%99%EA%B8%B0%ED%99%942.png)
+    C:\Users\Administrator>http POST http://localhost:8088/orders productId="4000" size="S" qty=1 price=50000
+    HTTP/1.1 201 Created
+    Content-Type: application/json;charset=UTF-8
+    Date: Thu, 17 Jun 2021 15:34:21 GMT
+    Location: http://localhost:8082/orders/3
+    transfer-encoding: chunked
 
-Delivery 서비스 재기동 후 주문취소
-![증빙9](https://github.com/bigot93/forthcafe/blob/main/images/%EB%8F%99%EA%B8%B0%ED%99%943.png)
+    {
+      "_links": {
+        "order": {
+            "href": "http://localhost:8082/orders/3"
+        },
+        "self": {
+            "href": "http://localhost:8082/orders/3"
+        }
+    },
+      "price": 50000,
+      "productId": "4000",
+      "qty": 1,
+      "size": "S",
+      "status": null
+    }
 
-Pay 서비스 상태를 보면 2번 주문 정상 취소 처리됨
-![증빙9](https://github.com/bigot93/forthcafe/blob/main/images/%EB%8F%99%EA%B8%B0%ED%99%944.png)
+** fallback 처리 **
 
-Fallback 설정
-![image](https://user-images.githubusercontent.com/5147735/109755775-f9b7ae80-7c29-11eb-8add-bdb295dc94e1.png)
-![image](https://user-images.githubusercontent.com/5147735/109755797-04724380-7c2a-11eb-8fcd-1c5135000ee5.png)
+주문-결제 Req-Res 구조에 Spring Hystrix 를 사용하여 Fallback 기능을 구현 FeignClient 내 Fallback 옵션과 Hystrix 설정 옵션으로 구현한다. 먼저 PaymentService 에 feignClient fallback 옵션을 추가하고 fallback 클래스&메소드를 추가한다.
 
+    package fashionstore.external;
 
-Fallback 결과(Pay service 종료 후 Order 추가 시)
-![image](https://user-images.githubusercontent.com/5147735/109755716-dab91c80-7c29-11eb-9099-ba585115a2a6.png)
+    import org.springframework.cloud.openfeign.FeignClient;
+    import org.springframework.stereotype.Component;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RequestMethod;
+    import org.springframework.web.bind.annotation.RequestParam;
+
+    import java.util.Date;
+
+    import feign.Feign;
+    import feign.hystrix.HystrixFeign;
+    import feign.hystrix.SetterFactory;
+
+    @FeignClient(name="payment", url="http://localhost:8085", fallback=PaymentService.PaymentServiceFallback.class)
+    public interface PaymentService {
+
+      @RequestMapping(method= RequestMethod.GET, path="/requestPayment")
+      public boolean pay(@RequestParam("orderId") Long id, @RequestParam("price") Long price);
+
+      @Component
+      class PaymentServiceFallback implements PaymentService {
+
+        @Override
+        public boolean pay(Long id, Long price){
+            System.out.println("*** PaymentServiceFallback works !!!!! ***");   // fallback 메소드 작동 테스트
+            return false;
+        }
+      }
+   }
+
+application.yml 파일에 feign.hystrix.enabled: true 로 활성화 시킨다.
+        
+    feign:
+      hystrix:
+       enabled: true
+
+payment 서비스를 중지하고 주문 수행 시에는 오류가 발생하나, 위와 같이 fallback 기능을 활성화 후 수행 시에는 아래와 같이 오류가 발생하지 않는다.
+    
+    C:\Users\Administrator>http POST http://localhost:8088/orders productId="4000" size="S" qty=1 price=50000
+    HTTP/1.1 201 Created
+    Content-Type: application/json;charset=UTF-8
+    Date: Thu, 17 Jun 2021 16:10:33 GMT
+    Location: http://localhost:8082/orders/1
+    transfer-encoding: chunked
+
+    {
+       "_links": {
+           "order": {
+               "href": "http://localhost:8082/orders/1"
+           },
+           "self": {
+               "href": "http://localhost:8082/orders/1"
+           }
+       },
+       "price": 50000,
+       "productId": "4000",
+       "qty": 1,
+       "size": "S",
+       "status": null
+    }
+
+order의 log를 보면 아래와 같이 fallback 작동 메시지가 display 된다.
+    
+    2021-06-18 01:10:32.285 DEBUG 27744 --- [container-0-C-1] o.s.c.s.m.DirectWithAttributesChannel    : postSend (sent=true) on channel 'event-in', message: GenericMessage [payload=byte[117], headers={kafka_offset=21, scst_nativeHeadersPresent=true, kafka_consumer=org.apache.kafka.clients.consumer.KafkaConsumer@67b7ba06, deliveryAttempt=1, kafka_timestampType=CREATE_TIME, kafka_receivedMessageKey=null, kafka_receivedPartitionId=0, contentType=application/json, kafka_receivedTopic=fashionstore, kafka_receivedTimestamp=1623946232221}]
+    *** PaymentServiceFallback works !!!!! ***
+
 
 # 운영
 
