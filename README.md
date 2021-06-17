@@ -359,9 +359,9 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
  
 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
 잠시 Payment 서비스 중지
-<이미지>
+![stopPayment](https://user-images.githubusercontent.com/84000864/122438745-ffb57d80-cfd5-11eb-91cc-a64e5b200803.PNG)
 
-주문 수행 시 오류 발생
+**주문 수행 시 오류 발생**
 
     C:\Users\Administrator>http POST http://localhost:8088/orders productId="4000" size="S" qty=1 price=50000
     HTTP/1.1 500 Internal Server Error
@@ -376,11 +376,11 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
       "timestamp": "2021-06-17T15:31:35.001+0000"
     }
 
-결제 서비스 구동
+**결제 서비스 구동**
 
     C:\Users\Administrator\Documents\MSA교육자료\fashion-store-main\fashion-store-main\payment>mvn spring-boot:run
 
-주문 재수행 - 정상처리됨을 확인
+**주문 재수행** - 정상처리됨을 확인
 
     C:\Users\Administrator>http POST http://localhost:8088/orders productId="4000" size="S" qty=1 price=50000
     HTTP/1.1 201 Created
@@ -405,7 +405,7 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
       "status": null
     }
 
-** fallback 처리 **
+**fallback 처리**
 
 주문-결제 Req-Res 구조에 Spring Hystrix 를 사용하여 Fallback 기능을 구현 FeignClient 내 Fallback 옵션과 Hystrix 설정 옵션으로 구현한다. 먼저 PaymentService 에 feignClient fallback 옵션을 추가하고 fallback 클래스&메소드를 추가한다.
 
