@@ -1,68 +1,25 @@
-
 ---
 
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product
+  name: customercenter
   labels:
-    app: product
+    app: customercenter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: product
+      app: customercenter
   template:
     metadata:
       labels:
-        app: product
+        app: customercenter
     spec:
       containers:
-        - name: product
-          image: username/product:latest
-          ports:
-            - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 10
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 10
-          livenessProbe:
-            httpGet:
-              path: '/actuator/health'
-              port: 8080
-            initialDelaySeconds: 120
-            timeoutSeconds: 2
-            periodSeconds: 5
-            failureThreshold: 5
-
-
----
-
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: order
-  labels:
-    app: order
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: order
-  template:
-    metadata:
-      labels:
-        app: order
-    spec:
-      containers:
-        - name: order
-          image: username/order:latest
+        - name: customercenter
+          image: team03skccacr.azurecr.io/fashionstore-customercenter:latest
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -104,7 +61,133 @@ spec:
     spec:
       containers:
         - name: delivery
-          image: username/delivery:latest
+          image: team03skccacr.azurecr.io/fashionstore-delivery:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+
+
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order
+          image: team03skccacr.azurecr.io/fashionstore-order:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+
+
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  labels:
+    app: payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      containers:
+        - name: payment
+          image: team03skccacr.azurecr.io/fashionstore-payment:latest
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+
+
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product
+  labels:
+    app: product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      containers:
+        - name: product
+          image: team03skccacr.azurecr.io/fashionstore-product:latest
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -131,15 +214,32 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: product
+  name: customercenter
   labels:
-    app: product
+    app: customercenter
 spec:
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: product
+    app: customercenter
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery
+  labels:
+    app: delivery
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: delivery
 
 
 ---
@@ -165,13 +265,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: delivery
+  name: payment
   labels:
-    app: delivery
+    app: payment
 spec:
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: delivery
+    app: payment
+
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: product
+  labels:
+    app: product
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: product
 
