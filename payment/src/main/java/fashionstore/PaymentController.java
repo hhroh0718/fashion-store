@@ -22,10 +22,11 @@ public boolean pay(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
                 boolean status = false;
                 Long orderId = Long.valueOf(request.getParameter("orderId"));
-                
+                Long price = Long.valueOf(request.getParameter("price"));
                 Payment payment = new Payment();
                 payment.setOrderId(orderId);
                 payment.setStatus("Paid");
+                payment.setPrice(price);
 
                 status = true;
                 paymentRepository.save(payment);

@@ -1,4 +1,5 @@
 fashionstore\PaymentController.class
+fashionstore\DeliveryCancelled.class
 fashionstore\PaymentRegistered.class
 fashionstore\config\kafka\KafkaProcessor.class
 fashionstore\PolicyHandler.class
@@ -6,4 +7,5 @@ fashionstore\AbstractEvent$1.class
 fashionstore\PaymentApplication.class
 fashionstore\Payment.class
 fashionstore\AbstractEvent.class
+fashionstore\OrderCancelled.class
 fashionstore\PaymentRepository.class

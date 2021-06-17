@@ -20,18 +20,25 @@ public class PolicyHandler{
     public void onStringEventListener(@Payload String eventString){
 
     }
+
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverDeliveryCancelled_CancelPayment(@Payload DeliveryCancelled deliveryCancelled){
+        if(deliveryCancelled.isMe()){
+            Payment payment = paymentRepository.findByOrderId(Long.valueOf(deliveryCancelled.getOrderId()));
+            payment.setStatus("PaymentCanceled");
+            paymentRepository.save(payment);
+
+        }
+    }
 /*
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderCancelled_IncreaseStock(@Payload OrderCancelled orderCancelled){
-
+    public void wheneverOrderCancelled_CancelPayment(@Payload OrderCancelled orderCancelled){
         if(orderCancelled.isMe()){
-            
-        //    Payment payment = paymentRepository.findByPaymentId(Long.valueOf(orderCancelled.getPaymentId()));
-        //    payment.setStock(payment.getStock() + orderCancelled.getQty());
-        //    paymentRepository.save(payment);
+            Payment payment = paymentRepository.findByOrderId(Long.valueOf(orderCancelled.getId()));
+            payment.setStatus("PaymentCanceled");
+            paymentRepository.save(payment);
 
         }
     }
 */
-
 }
