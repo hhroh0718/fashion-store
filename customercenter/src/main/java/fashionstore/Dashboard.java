@@ -16,6 +16,7 @@ public class Dashboard {
         private Integer qty;
         private Long deliveryId;
         private String status;
+        private Long price;
 
 
         public Long getId() {
@@ -68,5 +69,12 @@ public class Dashboard {
         public void setStatus(String status) {
             this.status = status;
         }
-
+        public Long getPrice() {
+            return price;
+        }
+    
+        public void setPrice(Long price) {
+            this.price = price;
+        }
+    
 }

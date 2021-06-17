@@ -27,7 +27,9 @@ public class DashboardViewHandler {
                 // view 객체에 이벤트의 Value 를 set 함
                 dashboard.setOrderId(ordered.getId());
                 dashboard.setProductId(ordered.getProductId());
+                dashboard.setSize(ordered.getSize());
                 dashboard.setQty(ordered.getQty());
+                dashboard.setPrice(ordered.getPrice());
                 // view 레파지 토리에 save
                 dashboardRepository.save(dashboard);
             }

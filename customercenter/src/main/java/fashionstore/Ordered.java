@@ -7,6 +7,7 @@ public class Ordered extends AbstractEvent {
     private String size;
     private Integer qty;
     private String status;
+    private Long price;
 
     public Long getId() {
         return id;
@@ -44,4 +45,12 @@ public class Ordered extends AbstractEvent {
     public void setStatus(String status) {
         this.status = status;
     }
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
 }
