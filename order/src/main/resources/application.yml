@@ -37,6 +37,18 @@ logging:
     org.springframework.cloud: debug
 server:
   port: 8082
+  
+
+api:
+  url:
+    # ProductServie 호출 주소
+    product: http://localhost:8081    
+    # PaymentServie 호출 주소
+    payment: http://localhost:8085
+    # DeliveryServie 호출 주소
+    delivery: http://localhost:8083
+  
+  
 ---
 
 spring:
@@ -62,3 +74,13 @@ spring:
         event-out:
           destination: fashionstore
           contentType: application/json
+
+# ProductServie 호출 주소
+api:
+  url:
+    # ProductServie 호출 주소
+    product: http://product:8080    
+    # PaymentServie 호출 주소
+    payment: http://payment:8080
+    # DeliveryServie 호출 주소
+    delivery: http://delivery:8080
