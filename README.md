@@ -24,7 +24,7 @@
 ![EventStormingV1](https://github.com/bigot93/forthcafe/blob/main/images/eventingstorming_forthcafe.png)
 
 # 헥사고날 아키텍처 다이어그램 도출
-![image](https://user-images.githubusercontent.com/85218591/122410679-19979600-cfbf-11eb-92f9-b97f17aa4e1f.png)
+![증빙10](https://github.com/bigot93/forthcafe/blob/main/images/%ED%97%A5%EC%82%AC%EA%B3%A0%EB%82%A0.png)
 
 # 구현
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 java로 구현하였다. 
@@ -198,22 +198,27 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: Order
+        - id: product
           uri: http://localhost:8081
           predicates:
-            - Path=/orders/** 
-        - id: Pay
+            - Path=/products/** 
+        - id: order
           uri: http://localhost:8082
           predicates:
-            - Path=/pays/** 
-        - id: Delivery
+            - Path=/orders/**, /ordercancels/**
+        - id: delivery
           uri: http://localhost:8083
           predicates:
-            - Path=/deliveries/** 
-        - id: MyPage
+            - Path=/deliveries/**, /cancellations/**
+        - id: customercenter
           uri: http://localhost:8084
           predicates:
-            - Path= /myPages/**
+            - Path=/dashboards/** 
+        - id: payment
+          uri: http://localhost:8085
+          predicates:
+            - Path=/payments/** 
+ 
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -224,8 +229,6 @@ spring:
             allowedHeaders:
               - "*"
             allowCredentials: true
-
-
 ---
 
 spring:
@@ -233,22 +236,27 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: Order
-          uri: http://Order:8080
+        - id: product
+          uri: http://product:8080
           predicates:
-            - Path=/orders/** 
-        - id: Pay
-          uri: http://Pay:8080
+            - Path=/products/**, /chkAndModifyStock/**
+        - id: order
+          uri: http://order:8080
           predicates:
-            - Path=/pays/** 
-        - id: Delivery
-          uri: http://Delivery:8080
+            - Path=/orders/**, /ordercancels/**
+        - id: delivery
+          uri: http://delivery:8080
           predicates:
-            - Path=/deliveries/** 
-        - id: MyPage
-          uri: http://MyPage:8080
+            - Path=/deliveries/**, /cancellations/** 
+        - id: customercenter
+          uri: http://customercenter:8080
           predicates:
-            - Path= /myPages/**
+            - Path=/dashboards/** 
+        - id: payment
+          uri: http://payment:8080
+          predicates:
+            - Path=/payments/** 
+
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -265,7 +273,7 @@ server:
 ```
 8088 port로 Order서비스 정상 호출
 
-![증빙1](https://github.com/bigot93/forthcafe/blob/main/images/gateway.png)
+![image](https://user-images.githubusercontent.com/84000933/122410564-fd93f480-cfbe-11eb-9550-bdbf6147602a.png)
 
 # CQRS/saga/correlation
 Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현해 두었다. 본 프로젝트에서 View 역할은 MyPages 서비스가 수행한다.
