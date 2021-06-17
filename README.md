@@ -85,17 +85,19 @@ public class Order {
 
     @PostPersist
     public void onPostPersist(){
+    
+        boolean rslt = OrderApplication.applicationContext.getBean(fashionstore.external.ProductService.class)
+            .modifyStock(this.getProductId(), this.getQty());
+
         if (rslt) {
 
             Ordered ordered = new Ordered();
             BeanUtils.copyProperties(this, ordered);
-            System.out.println("########### Before Order Publish...!! #######");
             ordered.publishAfterCommit();
 
             try {
-            //Thread.sleep(10000);
             OrderApplication.applicationContext.getBean(fashionstore.external.PaymentService.class)
-            .pay(this.getId(), this.getPrice());
+               .pay(this.getId(), this.getPrice());
             } catch(Exception e){};
         } 
     
@@ -120,14 +122,13 @@ public class Order {
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
+    
     public String getProductId() {
         return productId;
     }
-
     public void setProductId(String productId) {
         this.productId = productId;
     }
@@ -135,7 +136,6 @@ public class Order {
     public String getSize() {
         return size;
     }
-
     public void setSize(String size) {
         this.size = size;
     }
@@ -143,21 +143,20 @@ public class Order {
     public Integer getQty() {
         return qty;
     }
-
     public void setQty(Integer qty) {
         this.qty = qty;
     }
+    
     public String getStatus() {
         return status;
     }
-
     public void setStatus(String status) {
         this.status = status;
     }
+    
     public Long getPrice() {
         return price;
     }
-
     public void setPrice(Long price) {
         this.price = price;
     }
