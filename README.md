@@ -35,9 +35,6 @@
 # 기능/비기능 요구사항 검증
 ![image](https://user-images.githubusercontent.com/85218591/122432104-004b1580-cfd0-11eb-9dc5-9b139e49b867.png)
 
-# Event Storming 결과
-
-![modeling](https://user-images.githubusercontent.com/84000864/122414542-308bb780-cfc2-11eb-9a79-fe258fcf6acf.PNG)
 
 # 헥사고날 아키텍처 다이어그램 도출
 ![image](https://user-images.githubusercontent.com/85218591/122420665-cfb2ae00-cfc6-11eb-840a-f63a108877f1.png)
