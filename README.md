@@ -185,7 +185,7 @@ DDD 적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 �
 ![image](https://user-images.githubusercontent.com/84000933/122409811-662ea180-cfbe-11eb-9913-520415841429.png)
 
 # GateWay 적용
-API GateWay를 통하여 마이크로 서비스들의 집입점을 통일할 수 있다. 다음과 같이 GateWay를 적용하였다.
+API GateWay를 통하여 마이크로 서비스들의 입점을 통일할 수 있다. 다음과 같이 GateWay를 적용하였다.
 
 ```yaml
 server:
@@ -276,17 +276,17 @@ server:
 ![image](https://user-images.githubusercontent.com/84000933/122410564-fd93f480-cfbe-11eb-9550-bdbf6147602a.png)
 
 # CQRS/saga/correlation
-Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현해 두었다. 본 프로젝트에서 View 역할은 MyPages 서비스가 수행한다.
+Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현해 두었다. 
+본 프로젝트에서 View 역할은 Dashboards 서비스가 수행한다.
 
 주문(ordered) 실행 후 MyPages 화면
 
-![증빙3](https://github.com/bigot93/forthcafe/blob/main/images/order_pages.png)
+![image](https://user-images.githubusercontent.com/84000933/122423068-9b3ff180-cfc8-11eb-8e5c-015097144953.png)
 
-주문(OrderCancelled) 취소 후 MyPages 화면
+주문 취소 (OrderCancelled) 후 MyPages 화면
+![image](https://user-images.githubusercontent.com/84000933/122423280-c3c7eb80-cfc8-11eb-8a1d-6b855b561e53.png)
 
-![증빙4](https://github.com/bigot93/forthcafe/blob/main/images/cancel_pages.png)
-
-위와 같이 주문을 하게되면 Order > Pay > Delivery > MyPage로 주문이 Assigned 되고
+위와 같이 주문을 하게되면 Order > Pay > Delivery 되면서 주문이 배송이 시작된 상태(DeliveryStarted)를 Dashboards를 통해 확인가능하며, 
 
 주문 취소가 되면 Status가 deliveryCancelled로 Update 되는 것을 볼 수 있다.
 
@@ -299,11 +299,11 @@ Order 서비스의 DB와 MyPage의 DB를 다른 DB를 사용하여 폴리글랏�
 
 **Order의 pom.xml DB 설정 코드**
 
-![증빙5](https://github.com/bigot93/forthcafe/blob/main/images/db_conf1.png)
+![image](https://user-images.githubusercontent.com/84000933/122423857-3638cb80-cfc9-11eb-8ca5-ac172c0394d9.png)
 
-**MyPage의 pom.xml DB 설정 코드**
+**Payment의 pom.xml DB 설정 코드**
 
-![증빙6](https://github.com/bigot93/forthcafe/blob/main/images/db_conf2.png)
+![image](https://user-images.githubusercontent.com/84000933/122423929-42bd2400-cfc9-11eb-8258-130d4203f4f9.png)
 
 # 동기식 호출 과 Fallback 처리
 
