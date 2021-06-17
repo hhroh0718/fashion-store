@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product
+  name: payment
   labels:
-    app: product
+    app: payment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: product
+      app: payment
   template:
     metadata:
       labels:
-        app: product
+        app: payment
     spec:
       containers:
-        - name: product
-          image: username/product:latest
+        - name: payment
+          image: team03skccacr.azurecr.io/fashionstore-payment:latest
           ports:
             - containerPort: 8080
           readinessProbe:
