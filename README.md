@@ -238,24 +238,64 @@ port : 8088
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 pay 마이크로 서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다. 하지만, 일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있기 때문에 계속 사용할 방법은 아닌것 같다. (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
+- MSA 모델링 도구 ( MSA Easy .io )를 사용하여 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다.
+- order(주문), payment(결제), delivery(배송), product(상품), customercenter(고객관리) 등 객체를 선언했으며, 
+- 아래 코드는 order(주문) entity에 대한 예시이다. 
 
 ```
-package fooddelivery;
+package fashionstore;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
 import java.util.List;
+import java.util.Date;
 
 @Entity
-@Table(name="결제이력_table")
-public class 결제이력 {
+@Table(name="Order_table")
+public class Order {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private String orderId;
-    private Double 금액;
+    private String productId;
+    private Integer qty;
+    private String size;
+    private String status;
+    private Long price;
+
+    @PostPersist
+    public void onPostPersist(){
+        if (rslt) {
+
+            Ordered ordered = new Ordered();
+            BeanUtils.copyProperties(this, ordered);
+            System.out.println("########### Before Order Publish...!! #######");
+            ordered.publishAfterCommit();
+
+            try {
+            //Thread.sleep(10000);
+            OrderApplication.applicationContext.getBean(fashionstore.external.PaymentService.class)
+            .pay(this.getId(), this.getPrice());
+            } catch(Exception e){};
+        } 
+    
+    }
+
+    @PreRemove
+    public void onPreRemove(){
+
+        fashionstore.external.Cancellation cancellation = new fashionstore.external.Cancellation();
+        cancellation.setOrderId(this.getId());
+        cancellation.setStatus("Delivery Cancelled");
+
+        OrderApplication.applicationContext.getBean(fashionstore.external.CancellationService.class)
+            .registerCancelledOrder(cancellation);
+
+        OrderCancelled orderCancelled = new OrderCancelled();
+        BeanUtils.copyProperties(this, orderCancelled);
+        orderCancelled.publishAfterCommit();
+    
+    }
 
     public Long getId() {
         return id;
@@ -264,43 +304,67 @@ public class 결제이력 {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getOrderId() {
-        return orderId;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-    public Double get금액() {
-        return 금액;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
-    public void set금액(Double 금액) {
-        this.금액 = 금액;
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Integer getQty() {
+        return qty;
+    }
+
+    public void setQty(Integer qty) {
+        this.qty = qty;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
 }
 
 ```
 - Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
+
+OrderRepository.java 의 구현 내용 
 ```
-package fooddelivery;
+
+package fashionstore;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface 결제이력Repository extends PagingAndSortingRepository<결제이력, Long>{
+public interface OrderRepository extends PagingAndSortingRepository<Order, Long>{
+
 }
 ```
 - 적용 후 REST API 의 테스트
 ```
-# app 서비스의 주문처리
-http localhost:8081/orders item="통닭"
-
-# store 서비스의 배달처리
-http localhost:8083/주문처리s orderId=1
+# order 서비스의 주문처리
+http localhost:8082/orders productId="HYJU0001" size="L" qty=5 price=10000
 
 # 주문 상태 확인
-http localhost:8081/orders/1
+http localhost:8082/orders/1
 
 ```
 
