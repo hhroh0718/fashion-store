@@ -21,7 +21,7 @@ import java.util.List;
 public boolean modifyStock(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
                 boolean status = false;
-                Long productId = Long.valueOf(request.getParameter("productId"));
+                String productId = request.getParameter("productId");
                 int qty = Integer.parseInt(request.getParameter("qty"));
 
                 Product product = productRepository.findByProductId(productId);

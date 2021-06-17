@@ -22,8 +22,27 @@ public class PolicyHandler{
     }
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderCancelled_IncreaseStock(@Payload OrderCancelled orderCancelled){
+    public void wheneverDeliveryCancelled_IncreaseStock(@Payload DeliveryCancelled deliveryCancelled){
 
+        System.out.println("############# before isMe ############");
+        if(deliveryCancelled.isMe()){
+            //
+            System.out.println("############# before isMe ############");
+                     
+            Product product = productRepository.findByProductId(deliveryCancelled.getProductId());
+            System.out.println("############# etProductId ############  : " + deliveryCancelled.getOrderId());
+        
+            product.setStock(product.getStock() + deliveryCancelled.getQty());
+            System.out.println("############# product.getStock() ############  : " + product.getStock());
+            System.out.println("############# deliveryCancelled.getQty() ############  : " + deliveryCancelled.getQty());
+        
+            productRepository.save(product);
+            System.out.println("############# save  ############  : ");
+ 
+        }
+    }
+/*
+    public void wheneverOrderCancelled_IncreaseStock(@Payload OrderCancelled orderCancelled){
         if(orderCancelled.isMe()){
             //
             Product product = productRepository.findByProductId(Long.valueOf(orderCancelled.getProductId()));
@@ -31,6 +50,6 @@ public class PolicyHandler{
             productRepository.save(product);
 
         }
-    }
-
+    } 
+*/
 }

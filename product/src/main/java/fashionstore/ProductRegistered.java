@@ -3,7 +3,7 @@ package fashionstore;
 public class ProductRegistered extends AbstractEvent {
 
     private Long id;
-    private Long productId;
+    private String productId;
     private String productName;
     private String size;
     private Integer stock;
@@ -19,11 +19,11 @@ public class ProductRegistered extends AbstractEvent {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
     public String getProductName() {
