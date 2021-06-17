@@ -14,16 +14,15 @@ public class Delivery {
     private Long id;
     private Long orderId;
     private String status;
+    private String productId;
+    private Integer qty;
 
     @PostPersist
     public void onPostPersist(){
         Shipped shipped = new Shipped();
         BeanUtils.copyProperties(this, shipped);
         shipped.publishAfterCommit();
-
-
     }
-
 
     public Long getId() {
         return id;
@@ -47,7 +46,20 @@ public class Delivery {
         this.status = status;
     }
 
+    public String getProductId() {
+        return productId;
+    }
 
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
 
+    public Integer getQty() {
+        return qty;
+    }
+
+    public void setQty(Integer qty) {
+        this.qty = qty;
+    }
 
 }

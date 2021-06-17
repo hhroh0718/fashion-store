@@ -13,6 +13,9 @@ public class PolicyHandler{
     @Autowired
     DeliveryRepository deliveryRepository;
 
+    @Autowired
+    CancellationRepository cancellationRepository;
+
     @StreamListener(KafkaProcessor.INPUT)
     public void onStringEventListener(@Payload String eventString){
 
@@ -26,6 +29,8 @@ public class PolicyHandler{
             Delivery delivery = new Delivery();
             delivery.setOrderId(ordered.getId());
             delivery.setStatus("DeliveryStarted");
+            delivery.setProductId(ordered.getProductId());
+            delivery.setQty(ordered.getQty());
 
             deliveryRepository.save(delivery);
         }
