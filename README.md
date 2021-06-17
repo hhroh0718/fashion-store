@@ -1,4 +1,6 @@
 # Fashion-store
+![image](https://user-images.githubusercontent.com/84000933/122434624-3d180c00-cfd2-11eb-9a5a-e2f076020618.png)
+
 # 서비스 시나리오
 ### 기능적 요구사항
 1. MD가 상품(의류)를 등록한다.
