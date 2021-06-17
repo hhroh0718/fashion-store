@@ -1,4 +1,5 @@
 # Fashion-store
+![image](https://user-images.githubusercontent.com/84000933/122435072-a1d36680-cfd2-11eb-99fb-50d4d23baba3.png)
 
 # 서비스 시나리오
 ### 기능적 요구사항
