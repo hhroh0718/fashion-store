@@ -1,4 +1,4 @@
-# forthcafe
+# Fashion-store
 # 서비스 시나리오
 ### 기능적 요구사항
 1. 고객이 메뉴를 주문한다.
@@ -27,38 +27,47 @@
 ![증빙10](https://github.com/bigot93/forthcafe/blob/main/images/%ED%97%A5%EC%82%AC%EA%B3%A0%EB%82%A0.png)
 
 # 구현
-분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각각의 포트넘버는 8081 ~ 8084, 8088 이다)
+분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 java로 구현하였다. 
+구현한 각 서비스를 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
 ```
-cd Order
-mvn spring-boot:run  
+cd product 
+mvn spring-boot:run 
+port : 8081
 
-cd Pay
+cd order 
+mvn spring-boot:run 
+port : 8082
+
+cd delivery 
+mvn spring-boot:run 
+port : 8083
+
+cd customercenter 
+mvn spring-boot:run 
+port : 8084
+
+cd payment 
 mvn spring-boot:run
+port : 8085
 
-cd Delivery
+cd gateway 
 mvn spring-boot:run 
-
-cd MyPage
-mvn spring-boot:run  
-
-cd gateway
-mvn spring-boot:run 
+port : 8088
 ```
 
 ## DDD 의 적용
-msaez.io를 통해 구현한 Aggregate 단위로 Entity를 선언 후, 구현을 진행하였다.
-
-Entity Pattern과 Repository Pattern을 적용하기 위해 Spring Data REST의 RestRepository를 적용하였다.
+- MSA 모델링 도구 ( MSA Easy .io )를 사용하여 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다.
+- order(주문), payment(결제), delivery(배송), product(상품), customercenter(고객관리) 등 객체를 선언했으며,
+- 아래 코드는 order(주문) entity에 대한 예시이다.
 
 **Order 서비스의 Order.java**
 ```java 
-package forthcafe;
+package fashionstore;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
-
-import forthcafe.external.Pay;
-import forthcafe.external.PayService;
+import java.util.List;
+import java.util.Date;
 
 @Entity
 @Table(name="Order_table")
@@ -67,35 +76,45 @@ public class Order {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private String ordererName;
-    private String menuName;
-    private Long menuId;
-    private Double price;
-    private Integer quantity;
+    private String productId;
+    private Integer qty;
+    private String size;
     private String status;
+    private Long price;
 
     @PostPersist
     public void onPostPersist(){
-        Ordered ordered = new Ordered();
-        BeanUtils.copyProperties(this, ordered);
-        ordered.setStatus("Order");
-        
-        ordered.publish();
+        if (rslt) {
 
-        Pay pay = new Pay();
-        BeanUtils.copyProperties(this, pay);
-        
-        OrderApplication.applicationContext.getBean(PayService.class).pay(pay);
-    }
+            Ordered ordered = new Ordered();
+            BeanUtils.copyProperties(this, ordered);
+            System.out.println("########### Before Order Publish...!! #######");
+            ordered.publishAfterCommit();
+
+            try {
+            //Thread.sleep(10000);
+            OrderApplication.applicationContext.getBean(fashionstore.external.PaymentService.class)
+            .pay(this.getId(), this.getPrice());
+            } catch(Exception e){};
+        } 
     
+    }
+
     @PreRemove
     public void onPreRemove(){
+
+        fashionstore.external.Cancellation cancellation = new fashionstore.external.Cancellation();
+        cancellation.setOrderId(this.getId());
+        cancellation.setStatus("Delivery Cancelled");
+
+        OrderApplication.applicationContext.getBean(fashionstore.external.CancellationService.class)
+            .registerCancelledOrder(cancellation);
+
         OrderCancelled orderCancelled = new OrderCancelled();
         BeanUtils.copyProperties(this, orderCancelled);
-
         orderCancelled.publishAfterCommit();
+    
     }
-
 
     public Long getId() {
         return id;
@@ -104,19 +123,28 @@ public class Order {
     public void setId(Long id) {
         this.id = id;
     }
-    public Double getPrice() {
-        return price;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-    public Integer getQuantity() {
-        return quantity;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public Integer getQty() {
+        return qty;
+    }
+
+    public void setQty(Integer qty) {
+        this.qty = qty;
     }
     public String getStatus() {
         return status;
@@ -125,86 +153,27 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public String getOrdererName() {
-        return ordererName;
+    public Long getPrice() {
+        return price;
     }
 
-    public void setOrdererName(String ordererName) {
-        this.ordererName = ordererName;
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
-    public String getMenuName() {
-        return menuName;
-    }
-
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
-    }
-
-    public Long getMenuId() {
-        return menuId;
-    }
-
-    public void setMenuId(Long menuId) {
-        this.menuId = menuId;
-    }
 }
+
 ```
 
-**Pay 서비스의 PolicyHandler.java**
+**OrderRepository.java 의 구현 내용 **
+Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
+
 ```java
-package forthcafe;
+package fashionstore;
 
-import forthcafe.config.kafka.KafkaProcessor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Service;
-
-@Service
-public class PolicyHandler{
-
-    @Autowired
-    PayRepository payRepository;
-
-    @StreamListener(KafkaProcessor.INPUT)
-    public void onStringEventListener(@Payload String eventString){
-
-    }
-
-    @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderCancelled_(@Payload OrderCancelled orderCancelled){
-
-        try {
-            if(orderCancelled.isMe()){
-                System.out.println("##### OrderCancelled listener  : " + orderCancelled.toJson());
-    
-                Optional<Pay> Optional = payRepository.findById(orderCancelled.getId());
-    
-                if( Optional.isPresent()) {
-                    Pay pay = Optional.get();
-    
-                    // 객체에 이벤트의 eventDirectValue 를 set 함
-                    pay.setId(orderCancelled.getId());
-                    pay.setMenuId(orderCancelled.getMenuId());
-                    pay.setMenuName(orderCancelled.getMenuName());
-                    pay.setOrdererName(orderCancelled.getOrdererName());
-                    pay.setPrice(orderCancelled.getPrice());
-                    pay.setQuantity(orderCancelled.getQuantity());
-                    pay.setStatus("payCancelled");
-
-                    payRepository.save(pay);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+public interface OrderRepository extends PagingAndSortingRepository<Order, Long>{
 
 }
 ```
