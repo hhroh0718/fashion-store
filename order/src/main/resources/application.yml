@@ -31,6 +31,10 @@ spring:
           destination: fashionstore
           contentType: application/json
 
+feign:
+  hystrix:
+    enabled: true
+    
 logging:
   level:
     org.hibernate.type: trace
