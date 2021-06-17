@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: product
-          image: username/product:latest
+          image: team03skccacr.azurecr.io/fashionstore-product:latest
           ports:
             - containerPort: 8080
           readinessProbe:
