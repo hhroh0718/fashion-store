@@ -165,9 +165,9 @@ public class Order {
 
 ```
 
-**OrderRepository.java 의 구현 내용 **
-Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
+**Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 
+OrderRepository.java 의 구현 내용 
 ```java
 package fashionstore;
 
@@ -180,9 +180,9 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
 
 DDD 적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.
 
-- 원격 주문 (Order 주문 후 결과)
+- Order 주문 후 결과
 
-![증빙2](https://github.com/bigot93/forthcafe/blob/main/images/order.png)
+![image](https://user-images.githubusercontent.com/84000933/122409811-662ea180-cfbe-11eb-9913-520415841429.png)
 
 # GateWay 적용
 API GateWay를 통하여 마이크로 서비스들의 집입점을 통일할 수 있다. 다음과 같이 GateWay를 적용하였다.
