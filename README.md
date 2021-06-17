@@ -321,27 +321,31 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
 
 # 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 결재(Pay)와 배송(Delivery) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 Rest Repository에 의해 노출되어있는 REST 서비스를 FeignClient를 이용하여 호출하도록 한다.
+주문시 주문과 결제처리를 동기식으로 처리하는 요구사항이 있다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다.
 
-**Pay 서비스 내 external.DeliveryService**
-```java
-package forthcafe.external;
+주문(Order)서비스에서 결제서비스를 호출하기 위에 FeignClient 를 활용하여 Proxy를 구현하였다.
+
+**Order 서비스 내 external.PaymentService**
+
+package fashionstore.external;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 
-@FeignClient(name="Delivery", url="${api.url.delivery}") 
-public interface DeliveryService {
+@FeignClient(name="payment", url="http://localhost:8085")
+public interface PaymentService {
 
-    @RequestMapping(method = RequestMethod.POST, path = "/deliveries", consumes = "application/json")
-    public void delivery(@RequestBody Delivery delivery);
+    @RequestMapping(method= RequestMethod.GET, path="/requestPayment")
+    public boolean pay(@RequestParam("orderId") Long id, @RequestParam("price") Long price);
 
 }
-```
+
+주문 생성 직후(@PostPersist) 결제를 요청하도록 처리 Order.java Entity Class 내 추가
 
 **동작 확인**
 
