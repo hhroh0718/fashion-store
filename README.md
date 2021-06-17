@@ -20,19 +20,20 @@
 3. 성능
    1. 고객이 주문상태를 대쉬보드에서 확인할 수 있어야 한다 → CQRS
 
-# Event 도출
+# Event Storming
+### Event 도출
 ![image](https://user-images.githubusercontent.com/85218591/122431787-bbbf7a00-cfcf-11eb-8e6c-b529bebfda9c.png)
 
-# Command 도출
+### Command 도출
 ![image](https://user-images.githubusercontent.com/85218591/122431903-cf6ae080-cfcf-11eb-887e-a4b747392ade.png)
 
-# Aggregate 묶기 + Policy 적용
+### Aggregate 묶기 + Policy 적용
 ![image](https://user-images.githubusercontent.com/85218591/122431978-e1e51a00-cfcf-11eb-9bab-43c419579127.png)
 
-# Context Mapping 후 완성
+### Context Mapping 후 완성
 ![modeling](https://user-images.githubusercontent.com/84000864/122414542-308bb780-cfc2-11eb-9a79-fe258fcf6acf.PNG)
 
-# 기능/비기능 요구사항 검증
+### 기능/비기능 요구사항 검증
 ![image](https://user-images.githubusercontent.com/85218591/122432104-004b1580-cfd0-11eb-9dc5-9b139e49b867.png)
 
 
