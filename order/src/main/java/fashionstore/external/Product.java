@@ -3,7 +3,7 @@ package fashionstore.external;
 public class Product {
 
     private Long id;
-    private Long productId;
+    private String productId;
     private String productName;
     private String size;
     private Integer stock;
@@ -14,10 +14,10 @@ public class Product {
     public void setId(Long id) {
         this.id = id;
     }
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
     public String getProductName() {

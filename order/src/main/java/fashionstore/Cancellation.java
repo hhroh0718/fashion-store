@@ -1,14 +1,27 @@
-
 package fashionstore;
 
-public class Shipped extends AbstractEvent {
+import javax.persistence.*;
+import org.springframework.beans.BeanUtils;
+import java.util.List;
+import java.util.Date;
 
+@Entity
+@Table(name="Cancellation_table")
+public class Cancellation {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private Long orderId;
     private String status;
-    private String productId;
-    private Integer qty;
- 
+
+    @PostPersist
+    public void onPostPersist(){
+        OrderCancelled orderCancelled = new OrderCancelled();
+        BeanUtils.copyProperties(this, orderCancelled);
+        orderCancelled.publishAfterCommit();
+    }
+
     public Long getId() {
         return id;
     }
@@ -30,19 +43,8 @@ public class Shipped extends AbstractEvent {
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getProductId() {
-        return productId;
-    }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-    public Integer getQty() {
-        return qty;
-    }
 
-    public void setQty(Integer qty) {
-        this.qty = qty;
-    }
+
+
 }
-

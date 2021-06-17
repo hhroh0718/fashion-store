@@ -6,6 +6,7 @@ public class Payment {
     private Long id;
     private Long orderId;
     private String status;
+    private Long price;
  
     public Long getId() {
         return id;
@@ -28,6 +29,13 @@ public class Payment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
 }

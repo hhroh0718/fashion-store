@@ -16,6 +16,7 @@ public class Order {
     private Integer qty;
     private String size;
     private String status;
+    private Long price;
 
     @PostPersist
     public void onPostPersist(){
@@ -29,10 +30,18 @@ public class Order {
             .modifyStock(this.getProductId(), this.getQty());
 
         if (rslt) {
+
             Ordered ordered = new Ordered();
             BeanUtils.copyProperties(this, ordered);
             System.out.println("########### Before Order Publish...!! #######");
             ordered.publishAfterCommit();
+
+            try {
+            //Thread.sleep(10000);
+            OrderApplication.applicationContext.getBean(fashionstore.external.PaymentService.class)
+            .pay(this.getId(), this.getPrice());
+            } catch(Exception e){};
+
         } 
     
     }
@@ -43,7 +52,6 @@ public class Order {
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
         fashionstore.external.Cancellation cancellation = new fashionstore.external.Cancellation();
-        // mappings goes here -- hyun (2)
         cancellation.setOrderId(this.getId());
         cancellation.setStatus("Delivery Cancelled");
 
@@ -55,7 +63,6 @@ public class Order {
         orderCancelled.publishAfterCommit();
     
     }
-
 
     public Long getId() {
         return id;
@@ -94,8 +101,12 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
+    public Long getPrice() {
+        return price;
+    }
 
-
-
+    public void setPrice(Long price) {
+        this.price = price;
+    }
 
 }

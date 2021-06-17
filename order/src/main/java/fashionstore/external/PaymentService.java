@@ -13,6 +13,6 @@ import java.util.Date;
 public interface PaymentService {
 
     @RequestMapping(method= RequestMethod.GET, path="/requestPayment")
-    public boolean pay(@RequestParam("orderId") Long id);
+    public boolean pay(@RequestParam("orderId") Long id, @RequestParam("price") Long price);
 
 }

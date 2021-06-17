@@ -1,12 +1,15 @@
 fashionstore\Shipped.class
 fashionstore\external\PaymentService.class
+fashionstore\CancellationRepository.class
 fashionstore\Order.class
 fashionstore\OrderApplication.class
 fashionstore\OrderRepository.class
 fashionstore\external\Cancellation.class
 fashionstore\external\ProductService.class
 fashionstore\external\Payment.class
+fashionstore\CancellationController.class
 fashionstore\OrderCancelled.class
+fashionstore\Cancellation.class
 fashionstore\DeliveryCancelled.class
 fashionstore\Ordered.class
 fashionstore\external\CancellationService.class
