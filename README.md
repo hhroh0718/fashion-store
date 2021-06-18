@@ -569,8 +569,9 @@ docker push team03skccacr.azurecr.io/fashionstore-product:latest
 kubectl apply -f kubernetes/deployment.yml 
 kubectl expose deploy product --type=ClusterIP --port=8080
 ```
-* 이미지 빌드 및 ACR에 Push 모습
+* 이미지 빌드 및 ACR에 Push 하는 과정. Push 후 Azure Potal 레지스트에서도 확인이 가능
 ![3](https://user-images.githubusercontent.com/32154210/122490319-b50b2400-d01c-11eb-93b2-c01f13c633d7.PNG)
+![51](https://user-images.githubusercontent.com/32154210/122504403-38d10a80-d035-11eb-8784-7afb64a8fe8d.PNG)
 
 * 서비스 배포된 상태
 ![6](https://user-images.githubusercontent.com/32154210/122490451-ff8ca080-d01c-11eb-9dd3-ffbce34271e4.PNG)
