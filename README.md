@@ -674,6 +674,7 @@ kubectl get configmap envkind -o yaml
 
 ## Self-healing (Liveness Probe)
 * order 서비스에 Liveness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 [kubectl get deploy order -o yaml]명령어로 Liveness Probe가 정상 적용되었는지 확인
+
 ![37](https://user-images.githubusercontent.com/32154210/122496459-c6f1c480-d026-11eb-9756-7037fbb350aa.PNG)
 ![47](https://user-images.githubusercontent.com/32154210/122496829-5e571780-d027-11eb-87e3-fac127a1bd13.PNG)
 
