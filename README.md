@@ -322,6 +322,7 @@ View 역할인 Dashboards 서비스가 구현되어 주문 실행 및 취소에 
 또한 Correlation을 Key를 활용하여 Id를 Key값을 하고 원하는 주문하고 서비스간의 공유가 이루어졌음을 확인할 수 있음.
 이렇게 마이크로서비스로 구현된 컴포넌트 간 API 호출 시 업무를 시스템 전반에 걸쳐 일관되게 추적하기 위하여, 
 컴포넌트간 요청과 응답을 API 간 호출될 때 Correlation key를 이용하였음. 
+
 결제(Payment)을 하면 동시에 연관된 결제(Payment) 등의 서비스의 상태가 적당하게 변경이 되고,
 예약건의 취소를 수행하면 다시 연관된 방(Room), 결제(Payment) 등의 서비스의 상태값 등의 데이터가 적당한 상태로 변경되는 것을 확인할 수 있음
 PolicyHandler에서 처리 시 어떤 건에 대한 처리인지를 구별하기 위한 Correlation-key 구현을 이벤트 클래스 안의 변수로 전달받아 서비스간 연관된 처리를 구현하고 있음
@@ -348,6 +349,10 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
 **Payment의 pom.xml DB 설정 코드**
 
 ![image](https://user-images.githubusercontent.com/84000933/122492864-893e6d00-d021-11eb-9eab-36977c4c80a4.png)
+
+**payment 서비스 정상 동작 확인
+
+![image](https://user-images.githubusercontent.com/84000933/122508701-5ace8b00-d03d-11eb-9064-04b4fcd60eaa.png)
 
 # 동기식 호출 과 Fallback 처리
 
