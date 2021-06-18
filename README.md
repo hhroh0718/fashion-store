@@ -546,67 +546,27 @@ kubectl expose deploy product --type=ClusterIP --port=8080
 ![6](https://user-images.githubusercontent.com/32154210/122490451-ff8ca080-d01c-11eb-9dd3-ffbce34271e4.PNG)
 
 
-## 서킷 브레이킹
-* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
-* Order -> Pay 와의 Req/Res 연결에서 요청이 과도한 경우 CirCuit Breaker 통한 격리
-* Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
+## Circuit Breaker
+* 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 Req/Res 연결에서 요청이 과도한 경우 CirCuit Breaker 를 통해서 격리되도록 하였음
+Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 어느정도 유지되면 Circuit Breaker 회로가 작동하여
+요청을 빠르게 실패처리 처리하여 불필요하게 대기되는 시간을 줄임
 
-```
-// Order서비스 application.yml
+* Order 서비스의 application.yml 에 설정한 모습
+![22](https://user-images.githubusercontent.com/32154210/122491067-43cc7080-d01e-11eb-8f5f-777308537007.PNG)
 
-feign:
-  hystrix:
-    enabled: true
+* Payment 서비스 Payment.java 에 설정한 모습
+![42](https://user-images.githubusercontent.com/32154210/122491168-75453c00-d01e-11eb-80d5-457f704451f8.PNG)
 
-hystrix:
-  command:
-    default:
-      execution.isolation.thread.timeoutInMilliseconds: 610
-```
+* 부하를 주기 위해 siege 서비스 생성
+![13](https://user-images.githubusercontent.com/32154210/122491293-acb3e880-d01e-11eb-8f12-3ede6d72a30e.PNG)
 
-
-```
-// Pay 서비스 Pay.java
-
- @PostPersist
-    public void onPostPersist(){
-        Payed payed = new Payed();
-        BeanUtils.copyProperties(this, payed);
-        payed.setStatus("Pay");
-        payed.publishAfterCommit();
-
-        try {
-                 Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-         } catch (InterruptedException e) {
-                 e.printStackTrace();
-         }
-```
-
-* /home/project/team/forthcafe/yaml/siege.yaml
-```
-apiVersion: v1
-kind: Pod
-metadata:
-  name: siege
-spec:
-  containers:
-  - name: siege
-    image: apexacme/siege-nginx
-```
-
-* siege pod 생성
-```
-/home/project/team/forthcafe/yaml/kubectl apply -f siege.yaml
-```
-
-* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인: 동시사용자 100명 60초 동안 실시
+* siege 서비스를 사용하여 100의 User가 60초 동안 부하를 주고, 서킷 브레이커 동작 되는지 확인
 ```
 kubectl exec -it pod/siege -c siege -- /bin/bash
-siege -c100 -t60S  -v --content-type "application/json" 'http://{EXTERNAL-IP}:8080/orders POST {"memuId":2, "quantity":1}'
-siege -c100 -t30S  -v --content-type "application/json" 'http://52.141.61.164:8080/orders POST {"memuId":2, "quantity":1}'
+siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080/orders POST {"productId":"1500", "qty":1, "size":"30", "price":100}'
 ```
-![image](https://user-images.githubusercontent.com/5147735/109762408-dd207400-7c33-11eb-8464-325d781867ae.png)
-![image](https://user-images.githubusercontent.com/5147735/109762376-d1cd4880-7c33-11eb-87fb-b739aa2d6621.png)
+![25](https://user-images.githubusercontent.com/32154210/122491755-893d6d80-d01f-11eb-93e5-9050acc27b68.PNG)
+![26](https://user-images.githubusercontent.com/32154210/122491797-9bb7a700-d01f-11eb-8892-28fe8bc800a7.PNG)
 
 
 
