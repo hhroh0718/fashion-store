@@ -539,6 +539,12 @@ docker push team03skccacr.azurecr.io/fashionstore-product:latest
 kubectl apply -f kubernetes/deployment.yml 
 kubectl expose deploy product --type=ClusterIP --port=8080
 ```
+* 이미지 빌드 및 ACR에 Push 모습
+![3](https://user-images.githubusercontent.com/32154210/122490319-b50b2400-d01c-11eb-93b2-c01f13c633d7.PNG)
+
+* 서비스 배포된 상태
+![6](https://user-images.githubusercontent.com/32154210/122490451-ff8ca080-d01c-11eb-9dd3-ffbce34271e4.PNG)
+
 
 ## 서킷 브레이킹
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
