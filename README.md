@@ -630,7 +630,7 @@ siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080
 * 서비스가 재배포 되는 동안 siege 실행했던 쪽에서 실패가 발생됨
 ![39](https://user-images.githubusercontent.com/32154210/122494012-9eb49680-d023-11eb-9304-cc5c7b4bc201.PNG)
 
-* Readiness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 Readiness Probe가 정상 적용되었는지 확인
+* Readiness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 [kubectl get deploy order -o yaml]명령어로 Readiness Probe가 정상 적용되었는지 확인
 ![44](https://user-images.githubusercontent.com/32154210/122495057-aaed2380-d024-11eb-95e9-5859a676370e.PNG)
 ![46](https://user-images.githubusercontent.com/32154210/122496720-2e0f7900-d027-11eb-9ed4-71d4f148b99f.PNG)
 
@@ -658,16 +658,19 @@ kubectl get configmap envkind -o yaml
 ![50](https://user-images.githubusercontent.com/32154210/122498444-1685bf80-d02a-11eb-8e22-927cd335730f.PNG)
 
 
-* delivery 에 Config 설정하고 로그가 생성된 것을 확인
-```
-kubectl logs {pod ID}
-```
-<이미지 위치>
+* delivery 서비스 소스에 Configmap 설정 부분 추가 함
+![54](https://user-images.githubusercontent.com/32154210/122503213-00c8c800-d033-11eb-94cf-e74bf2e108f0.PNG)
+
+* delivery 서비스 log를 봐서 해당 설정이 제대로 적용되었는지 확인
+![55](https://user-images.githubusercontent.com/32154210/122503413-5ac98d80-d033-11eb-84c8-b9783bf5092c.PNG)
+![56](https://user-images.githubusercontent.com/32154210/122503545-9a907500-d033-11eb-8ca0-04c2c7a596e2.PNG)
+
+
 
 
 
 ## Self-healing (Liveness Probe)
-* order 서버시에 Liveness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 Liveness Probe가 정상 적용되었는지 확인
+* order 서비스에 Liveness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 [kubectl get deploy order -o yaml]명령어로 Liveness Probe가 정상 적용되었는지 확인
 ![37](https://user-images.githubusercontent.com/32154210/122496459-c6f1c480-d026-11eb-9756-7037fbb350aa.PNG)
 ![47](https://user-images.githubusercontent.com/32154210/122496829-5e571780-d027-11eb-87e3-fac127a1bd13.PNG)
 
@@ -681,6 +684,5 @@ root@siege:/# siege -c100 -t180S  -v --content-type "application/json" 'http://5
 
 * 잠시후 다시 kubectl get pods 한 결과 아래와 같이 order 서비스가 정상적으로 활성화 된 것을 확인 할 수 있음
 ![49](https://user-images.githubusercontent.com/32154210/122497892-1933e500-d029-11eb-9a0d-ad6ac6954483.PNG)
-
 
 
