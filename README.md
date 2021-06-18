@@ -643,6 +643,7 @@ siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080
 ![39](https://user-images.githubusercontent.com/32154210/122494012-9eb49680-d023-11eb-9304-cc5c7b4bc201.PNG)
 
 * Readiness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 [kubectl get deploy order -o yaml]명령어로 Readiness Probe가 정상 적용되었는지 확인
+
 ![44](https://user-images.githubusercontent.com/32154210/122495057-aaed2380-d024-11eb-95e9-5859a676370e.PNG)
 ![46](https://user-images.githubusercontent.com/32154210/122496720-2e0f7900-d027-11eb-9ed4-71d4f148b99f.PNG)
 
