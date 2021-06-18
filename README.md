@@ -14,7 +14,7 @@
 
 ### 비기능적 요구사항
 1. 트랜젝션
-   1. 결제가 취소되면 주문이 진행되지 않는다 → Sync 호출
+   1. 주문이 완료되어야 결재가 진행됨 → Sync 호출
 2. 장애격리
    1. 배송에서 장애가 발송해도 결제와 주문은 24시간 받을 수 있어야 한다 →Async(event-driven), Eventual Consistency
    1. 결제가 과중되면 결제를 잠시 후에 하도록 유도한다 → Circuit breaker, fallback
@@ -39,7 +39,7 @@
 
 
 # 헥사고날 아키텍처 다이어그램 도출
-![image](https://user-images.githubusercontent.com/85218591/122420665-cfb2ae00-cfc6-11eb-840a-f63a108877f1.png)
+![image](https://user-images.githubusercontent.com/85218591/122488385-55127e80-d018-11eb-8124-1e2a040d7efa.png)
 
 # 구현
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 java로 구현하였다. 
