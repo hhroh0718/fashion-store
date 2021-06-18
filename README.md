@@ -33,7 +33,7 @@
 ![image](https://user-images.githubusercontent.com/85218591/122431978-e1e51a00-cfcf-11eb-9bab-43c419579127.png)
 
 ### Context Mapping 후 완성
-![modeling](https://user-images.githubusercontent.com/84000864/122414542-308bb780-cfc2-11eb-9a79-fe258fcf6acf.PNG)
+![image](https://user-images.githubusercontent.com/85218591/122508740-6e79f180-d03d-11eb-8914-404cb0aa7995.png)
 
 ### 기능/비기능 요구사항 검증
 ![image](https://user-images.githubusercontent.com/85218591/122488649-dd911f00-d018-11eb-8304-bf2b2061e03f.png)
@@ -315,7 +315,7 @@ View 역할인 Dashboards 서비스가 구현되어 주문 실행 및 취소에 
 **주문 취소 (OrderCancelled) 후 Dashboard 화면
 ![image](https://user-images.githubusercontent.com/84000933/122423280-c3c7eb80-cfc8-11eb-8a1d-6b855b561e53.png)
 
-위와 같이 주문을 하게되면 Order > Pay > Delivery 되면서 주문이 배송이 시작된 상태(DeliveryStarted)를 Dashboards를 통해 확인가능하며, 
+위와 같이 주문을 하게되면 Order > Delivery 되면서 주문이 배송이 시작된 상태(DeliveryStarted)를 Dashboards를 통해 확인가능하며, 
 
 주문 취소가 되면 Status가 deliveryCancelled로 Update 되는 것을 볼 수 있음
 
