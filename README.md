@@ -588,7 +588,7 @@ siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:80
 
 
 ## Zero-downtime deploy (Readiness Probe)
-* siege로 1명의 user가 60초동안 수행되도록 실행함
+* order 서비스에 siege로 1명의 user가 60초동안 수행되도록 실행함
 ```
 kubectl exec -it pod/siege -c siege -- /bin/bash
 siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080/orders POST {"productId":"1500", "qty":1, "size":"30", "price":100}'
@@ -602,7 +602,7 @@ siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080
 
 * Readiness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 Readiness Probe가 정상 적용되었는지 확인
 ![44](https://user-images.githubusercontent.com/32154210/122495057-aaed2380-d024-11eb-95e9-5859a676370e.PNG)
-![45](https://user-images.githubusercontent.com/32154210/122495753-90677a00-d025-11eb-993c-b8de1d164bad.PNG)
+![46](https://user-images.githubusercontent.com/32154210/122496720-2e0f7900-d027-11eb-9ed4-71d4f148b99f.PNG)
 
 * 앞서 진행했던 과정을 반복함. 즉 siege로 1명의 user가 60초동안 수행되도록 하고, kubectl set image로 서비스 재배포를
 하는 동안에 서비스 영향 받았는지 확인한 결과 배포영향없이 가용성 100%가 되어 무중단 배포가 되었음을 확인
@@ -635,21 +635,21 @@ kubectl logs {pod ID}
 
 
 
-
 ## Self-healing (Liveness Probe)
-* order 서비스 deployment.yml   livenessProbe 설정을 port 8089로 변경 후 배포 하여 liveness probe 가 동작함을 확인 
-```
-    livenessProbe:
-      httpGet:
-        path: '/actuator/health'
-        port: 8089
-      initialDelaySeconds: 5
-      periodSeconds: 5
-```
+* order 서버시에 Liveness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 Liveness Probe가 정상 적용되었는지 확인
+![37](https://user-images.githubusercontent.com/32154210/122496459-c6f1c480-d026-11eb-9756-7037fbb350aa.PNG)
+![47](https://user-images.githubusercontent.com/32154210/122496829-5e571780-d027-11eb-87e3-fac127a1bd13.PNG)
 
-![image](https://user-images.githubusercontent.com/5147735/109740864-4fcb2880-7c0f-11eb-86ad-2aabb0197881.png)
-![image](https://user-images.githubusercontent.com/5147735/109742082-c0734480-7c11-11eb-9a57-f6dd6961a6d2.png)
+* order 서비스에 부하를 줘서 서비스를 죽게하였음. 
+```
+root@siege:/# siege -c100 -t180S  -v --content-type "application/json" 'http://52.231.76.246:8080/orders POST {"productId":"1700", "qty":1
+, "size":"30", "price":100}'
+```
+* kubectl get pods 한 결과 아래와 같이 order 서비스가 비활성화 인 것을 확인 할 수 있음
+![48](https://user-images.githubusercontent.com/32154210/122497804-f73a6280-d028-11eb-9e5b-3a5eb0b7fd7a.PNG)
 
+* 잠시후 다시 kubectl get pods 한 결과 아래와 같이 order 서비스가 정상적으로 활성화 된 것을 확인 할 수 있음
+![49](https://user-images.githubusercontent.com/32154210/122497892-1933e500-d029-11eb-9a0d-ad6ac6954483.PNG)
 
 
 
