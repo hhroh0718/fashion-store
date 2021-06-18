@@ -585,8 +585,8 @@ Push 후 Azure Potal 레지스트에서도 확인이 가능
 
 
 ## Circuit Breaker
-* 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 Req/Res 연결에서 요청이 과도한 경우 CirCuit Breaker 를 통해서 격리되도록 하였음
-Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 어느정도 유지되면 Circuit Breaker 회로가 작동
+* 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 동기호출(Req/Res)에서 요청이 과도한 경우 Circuit Breaker 를 통해서 격리되도록 하였음
+Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 Circuit Breaker 회로가 작동
 
 * Order 서비스의 application.yml 에 설정한 모습
 ![22](https://user-images.githubusercontent.com/32154210/122491067-43cc7080-d01e-11eb-8f5f-777308537007.PNG)
