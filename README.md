@@ -579,8 +579,7 @@ kubectl expose deploy product --type=ClusterIP --port=8080
 
 ## Circuit Breaker
 * 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 Req/Res 연결에서 요청이 과도한 경우 CirCuit Breaker 를 통해서 격리되도록 하였음
-Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 어느정도 유지되면 Circuit Breaker 회로가 작동하여
-요청을 빠르게 실패처리 처리하여 불필요하게 대기되는 시간을 줄임
+Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 어느정도 유지되면 Circuit Breaker 회로가 작동
 
 * Order 서비스의 application.yml 에 설정한 모습
 ![22](https://user-images.githubusercontent.com/32154210/122491067-43cc7080-d01e-11eb-8f5f-777308537007.PNG)
@@ -598,6 +597,9 @@ siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:80
 ```
 ![25](https://user-images.githubusercontent.com/32154210/122491755-893d6d80-d01f-11eb-93e5-9050acc27b68.PNG)
 ![26](https://user-images.githubusercontent.com/32154210/122491797-9bb7a700-d01f-11eb-8892-28fe8bc800a7.PNG)
+
+* 처음에는 정상적으로 서비스 되다가 (파란색, 201코드) 요청이 과도하게 몰리게 되면 중간중간 Circuit Breaker 가 작동하여 차단(빨간색, 500에러 코드) 했다가, 다시 적체가 풀리면 회복되는 상태가 반복이 됨. 부하 테스트기 확인한 결과 가용성에 문제점이 있음
+
 
 
 ## Autoscale (HPA)
