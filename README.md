@@ -537,7 +537,8 @@ cd ../product
 mvn package -Dmaven.test.skip=true
 ```
 
-* Docker로 이미지 Biuld하고, Azure Registry에 Push 및 depolyment.yml 파일을 이용하여 서비스 생성
+* Docker로 이미지 Biuld하고, Azure Registry에 Push하였습니다.
+  각 서비스는 depolyment.yml 파일을 이용하여 배포하였습니다.
 ```
 cd customercenter
 docker build -t team03skccacr.azurecr.io/fashionstore-customercenter:latest .
@@ -575,18 +576,18 @@ docker push team03skccacr.azurecr.io/fashionstore-product:latest
 kubectl apply -f kubernetes/deployment.yml 
 kubectl expose deploy product --type=ClusterIP --port=8080
 ```
-* 이미지 빌드 및 ACR에 Push 하는 과정. 
+* 이미지 빌드 및 ACR에 Push 하는 과정입니다.
 ![3](https://user-images.githubusercontent.com/32154210/122490319-b50b2400-d01c-11eb-93b2-c01f13c633d7.PNG)
-Push 후 Azure Potal 레지스트에서도 확인이 가능
+Push 후 Azure Potal 레지스트에서도 확인이 가능합니다.
 ![51](https://user-images.githubusercontent.com/32154210/122504403-38d10a80-d035-11eb-8784-7afb64a8fe8d.PNG)
 
-* 서비스 배포된 상태
+* 서비스가 정상적으로 배포되어 정상가동된 것을 확인할 수 있습니다.
 ![6](https://user-images.githubusercontent.com/32154210/122490451-ff8ca080-d01c-11eb-9dd3-ffbce34271e4.PNG)
 
 
 ## Circuit Breaker
-* 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 동기호출(Req/Res)에서 요청이 과도한 경우 Circuit Breaker 를 통해서 격리되도록 하였음
-Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 Circuit Breaker 회로가 작동
+* 서킷 브레이크는  FeignClient 와 Hystrix 옵션을 사용하여 구현하였고, Order -> Payment 와의 동기호출(Req/Res)에서 요청이 과도한 경우 Circuit Breaker 를 통해서 격리되도록 하였습니다.
+Hystrix 설정은 요청처리 쓰레드에서 처리시간이 500 밀리가 넘어서기 시작하여 Circuit Breaker 회로가 작동
 
 * Order 서비스의 application.yml 에 설정한 모습
 ![22](https://user-images.githubusercontent.com/32154210/122491067-43cc7080-d01e-11eb-8f5f-777308537007.PNG)
@@ -597,7 +598,7 @@ Hystrix 를 설정: 요청처리 쓰레드에서 처리시간이 500 밀리가 �
 * 부하를 주기 위해 siege 서비스 생성
 ![13](https://user-images.githubusercontent.com/32154210/122491293-acb3e880-d01e-11eb-8f12-3ede6d72a30e.PNG)
 
-* siege 서비스를 사용하여 100의 User가 60초 동안 부하를 주고, 서킷 브레이커 동작 되는지 확인
+* siege 서비스를 사용하여 100의 User가 60초 동안 부하를 주고, 서킷 브레이커가 동작 되는지 확인하였습니다.
 ```
 kubectl exec -it pod/siege -c siege -- /bin/bash
 siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080/orders POST {"productId":"1500", "qty":1, "size":"30", "price":100}'
@@ -605,12 +606,13 @@ siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:80
 ![25](https://user-images.githubusercontent.com/32154210/122491755-893d6d80-d01f-11eb-93e5-9050acc27b68.PNG)
 ![26](https://user-images.githubusercontent.com/32154210/122491797-9bb7a700-d01f-11eb-8892-28fe8bc800a7.PNG)
 
-* 처음에는 정상적으로 서비스 되다가 (파란색, 201코드) 요청이 과도하게 몰리게 되면 중간중간 Circuit Breaker 가 작동하여 차단(빨간색, 500에러 코드) 했다가, 다시 적체가 풀리면 회복되는 상태가 반복이 됨. 부하 테스트기 확인한 결과 가용성에 문제점이 있음
+* 처음에는 정상적으로 서비스 되다가 (파란색, 201코드) 요청이 과도하게 몰리게 되면 중간중간 Circuit Breaker 가 작동하여 차단(빨간색, 500에러 코드)됩니다. 이후 다시 적체가 풀리면 회복이 되는 상태가 반복이 됩니다.
+이처럼 부하 테스트기로 확인한 결과 가용성에 문제점이 있습니다.
 
 
 
 ## Autoscale (HPA)
-* 서킷 브레이커(CB) 는 down되는 장애를 줄여 줄 수 있지만 사용자의 요청을 다 수용하지 못하고, 일부 Fail이 발생하므로, 보다 안정적인 서비스를 위해 시스템 부하시 자동으로 확장되는 Autoscailing 을 적용하였음
+* 서킷 브레이커(CB) 는 down되는 장애를 줄여 줄 수 있지만 사용자의 요청을 다 수용하지 못하므로 보다 안정적인 서비스를 위해 시스템 부하시 자동으로 확장되는 Autoscailing 을 적용하였습니다.
 
 * 테스트를 위해 Order 서비스의 deployment.yml 에 리소스 제한을 설정한 모습
 ![14](https://user-images.githubusercontent.com/32154210/122492173-429c4300-d020-11eb-8d96-bab5c5d66239.PNG)
