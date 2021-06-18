@@ -19,6 +19,13 @@ public class Delivery {
 
     @PostPersist
     public void onPostPersist(){
+        //ConfigMap 설정
+        String sysEnv = System.getenv("SYSENV");
+        if(sysEnv == null) {
+            sysEnv = "LOCAL";
+        }
+        System.out.println("********** ConfigMap SYSENV : " + sysEnv);
+        
         Shipped shipped = new Shipped();
         BeanUtils.copyProperties(this, shipped);
         shipped.publishAfterCommit();
