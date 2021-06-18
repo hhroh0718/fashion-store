@@ -22,6 +22,7 @@
    1. 고객이 주문상태를 대쉬보드에서 확인할 수 있어야 한다 → CQRS
 
 # Event Storming
+* MSAEz 로 모델링한 이벤트스토밍 결과:  http://www.msaez.io/#/storming/YmPbSDxidGOzqA7V3IDjH9sfUEq1/share/d22852a5393c878441b9910b71f02a52
 ### Event 도출
 ![image](https://user-images.githubusercontent.com/85218591/122431787-bbbf7a00-cfcf-11eb-8e6c-b529bebfda9c.png)
 
