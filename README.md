@@ -299,7 +299,7 @@ Order, Payment, Delivery 등 서비스의 전체 현황 및 상태 조회를 제
 
 Order가 생성될 때 Dashboard 데이터도 생성되고, 이후 "결제 완료", "주문취소", "배송시작", "배송취소" 등의 이벤트에 따라 주문상태 및 배송상태를 수정하도록 모델링하였다. 
 
-MSAEZ 모델링 도구 내 View CQRS 설정 화면 
+**MSAEZ 모델링 도구 내 View CQRS 설정 화면 
 
 ![image](https://user-images.githubusercontent.com/84000933/122492363-91e27380-d020-11eb-8e30-c6a00bf8911a.png)
 
@@ -307,11 +307,11 @@ MSAEZ 모델링 도구 내 View CQRS 설정 화면
 
 View 역할인 Dashboards 서비스가 구현되어 주문 실행 및 취소에 대한 조회되는 화면이다. 
 
-주문(ordered) 실행 후 Dashboard 화면
+**주문(ordered) 실행 후 Dashboard 화면
 
 ![image](https://user-images.githubusercontent.com/84000933/122423068-9b3ff180-cfc8-11eb-8e5c-015097144953.png)
 
-주문 취소 (OrderCancelled) 후 Dashboard 화면
+**주문 취소 (OrderCancelled) 후 Dashboard 화면
 ![image](https://user-images.githubusercontent.com/84000933/122423280-c3c7eb80-cfc8-11eb-8a1d-6b855b561e53.png)
 
 위와 같이 주문을 하게되면 Order > Pay > Delivery 되면서 주문이 배송이 시작된 상태(DeliveryStarted)를 Dashboards를 통해 확인가능하며, 
