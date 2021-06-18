@@ -588,18 +588,26 @@ siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:80
 
 
 ## Zero-downtime deploy (Readiness Probe)
-* 배포전
+* siege로 1명의 user가 60초동안 수행되도록 실행함
+```
+kubectl exec -it pod/siege -c siege -- /bin/bash
+siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080/orders POST {"productId":"1500", "qty":1, "size":"30", "price":100}'
+```
 
-![image](https://user-images.githubusercontent.com/5147735/109743733-89526280-7c14-11eb-93da-0ddd3cd18e22.png)
+* kubectl set image로 서비스 재배포
+![32](https://user-images.githubusercontent.com/32154210/122493875-68771700-d023-11eb-9602-787e499cc688.PNG)
 
-* 배포중
+* 서비스가 재배포 되는 동안 siege 실행했던 쪽에서 실패가 발생됨
+![39](https://user-images.githubusercontent.com/32154210/122494012-9eb49680-d023-11eb-9304-cc5c7b4bc201.PNG)
 
-![image](https://user-images.githubusercontent.com/5147735/109744076-11386c80-7c15-11eb-849d-6cf4e2c72675.png)
-![image](https://user-images.githubusercontent.com/5147735/109744186-3a58fd00-7c15-11eb-8da3-f11b6194fc6b.png)
+* Readiness Probe 설정을 아래와 같이 설정한 후 deployment를 다시해서 Readiness Probe가 정상 적용되었는지 확인
+![44](https://user-images.githubusercontent.com/32154210/122495057-aaed2380-d024-11eb-95e9-5859a676370e.PNG)
+![45](https://user-images.githubusercontent.com/32154210/122495753-90677a00-d025-11eb-993c-b8de1d164bad.PNG)
 
-* 배포후
+* 앞서 진행했던 과정을 반복함. 즉 siege로 1명의 user가 60초동안 수행되도록 하고, kubectl set image로 서비스 재배포를
+하는 동안에 서비스 영향 받았는지 확인한 결과 배포영향없이 가용성 100%가 되어 무중단 배포가 되었음을 확인
+![33](https://user-images.githubusercontent.com/32154210/122495930-dfadaa80-d025-11eb-8328-56cd08ef70ca.PNG)
 
-![image](https://user-images.githubusercontent.com/5147735/109744225-45139200-7c15-11eb-8efa-07ac40162ded.png)
 
 
 ## Config Map
