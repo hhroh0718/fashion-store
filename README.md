@@ -289,8 +289,18 @@ server:
 ![image](https://user-images.githubusercontent.com/84000933/122410564-fd93f480-cfbe-11eb-9550-bdbf6147602a.png)
 
 # CQRS/saga/correlation
-Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현해 두었다. 
+Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 모델링하였다.
+
 ![image](https://user-images.githubusercontent.com/84000933/122491613-48ddef80-d01f-11eb-925a-6e293cba37cf.png)
+
+Order, Payment, Delivery 등 서비스의 전체 현황 및 상태 조회를 제공하기 위해 주문 서비스 내에 Dashboards View를 모델링 하였다.
+![image](https://user-images.githubusercontent.com/84000933/122491834-aeca7700-d01f-11eb-8ce6-97ecbe42ba09.png)
+
+Order가 생성될 때 Dashboard 데이터도 생성되고, 이후 "결제 완료", "주문취소", "배송시작", "배송취소" 등의 이벤트에 따라 주문상태 및 배송상태를 수정하도록 모델링하였다. 
+
+MSAEZ 모델링 도구 내 View CQRS 설정 화면 
+![image](https://user-images.githubusercontent.com/84000933/122492363-91e27380-d020-11eb-8e30-c6a00bf8911a.png)
+![image](https://user-images.githubusercontent.com/84000933/122492542-ee459300-d020-11eb-80bd-bcbdc84a0194.png)
 
 본 프로젝트에서 View 역할은 Dashboards 서비스가 수행한다.
 
