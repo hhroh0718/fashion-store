@@ -293,11 +293,11 @@ server:
 Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 구현해 두었다. 
 본 프로젝트에서 View 역할은 Dashboards 서비스가 수행한다.
 
-주문(ordered) 실행 후 MyPages 화면
+주문(ordered) 실행 후 Dashboard 화면
 
 ![image](https://user-images.githubusercontent.com/84000933/122423068-9b3ff180-cfc8-11eb-8e5c-015097144953.png)
 
-주문 취소 (OrderCancelled) 후 MyPages 화면
+주문 취소 (OrderCancelled) 후 Dashboard 화면
 ![image](https://user-images.githubusercontent.com/84000933/122423280-c3c7eb80-cfc8-11eb-8a1d-6b855b561e53.png)
 
 위와 같이 주문을 하게되면 Order > Pay > Delivery 되면서 주문이 배송이 시작된 상태(DeliveryStarted)를 Dashboards를 통해 확인가능하며, 
