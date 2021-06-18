@@ -479,186 +479,66 @@ order의 log를 보면 아래와 같이 fallback 작동 메시지가 display 된
 
 # 운영
 
-## CI/CD
-* 카프카 설치
+## Deploy
+* 패키지 Build
 ```
-- 헬름 설치
-참고 : http://msaschool.io/operation/implementation/implementation-seven/
-curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
-chmod 700 get_helm.sh
-./get_helm.sh
+cd customercenter
+mvn package -Dmaven.test.skip=true
 
-- Azure Only
-kubectl patch storageclass managed -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+cd ../delivery
+mvn package -Dmaven.test.skip=true
 
-- 카프카 설치
-kubectl --namespace kube-system create sa tiller      # helm 의 설치관리자를 위한 시스템 사용자 생성
-kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+cd ../gateway
+mvn package -Dmaven.test.skip=true
 
-helm repo add incubator https://charts.helm.sh/incubator
-helm repo update
-kubectl create ns kafka
-helm install my-kafka --namespace kafka incubator/kafka
+cd ../order
+mvn package -Dmaven.test.skip=true
 
-kubectl get po -n kafka -o wide
-```
-* Topic 생성
-```
-kubectl -n kafka exec my-kafka-0 -- /usr/bin/kafka-topics --zookeeper my-kafka-zookeeper:2181 --topic forthcafe --create --partitions 1 --replication-factor 1
-```
-* Topic 확인
-```
-kubectl -n kafka exec my-kafka-0 -- /usr/bin/kafka-topics --zookeeper my-kafka-zookeeper:2181 --list
-```
-* 이벤트 발행하기
-```
-kubectl -n kafka exec -ti my-kafka-0 -- /usr/bin/kafka-console-producer --broker-list my-kafka:9092 --topic forthcafe
-```
-* 이벤트 수신하기
-```
-kubectl -n kafka exec -ti my-kafka-0 -- /usr/bin/kafka-console-consumer --bootstrap-server my-kafka:9092 --topic forthcafe --from-beginning
+cd ../payment
+mvn package -Dmaven.test.skip=true
+
+cd ../product
+mvn package -Dmaven.test.skip=true
 ```
 
-* 소스 가져오기
+* Docker로 이미지 Biuld하고, Azure Registry에 Push 및 depolyment.yml 파일을 이용하여 서비스 생성
 ```
-git clone https://github.com/bigot93/forthcafe.git
-```
-
-## ConfigMap
-* deployment.yml 파일에 설정
-```
-env:
-   - name: SYS_MODE
-     valueFrom:
-       configMapKeyRef:
-         name: systemmode
-         key: sysmode
-```
-* Configmap 생성, 정보 확인
-```
-kubectl create configmap systemmode --from-literal=sysmode=PRODUCT
-kubectl get configmap systemmode -o yaml
-```
-![image](https://user-images.githubusercontent.com/5147735/109768817-bb77ba80-7c3c-11eb-8856-7fca5213f5b1.png)
-
-* order 1건 추가후 로그 확인
-```
-kubectl logs {pod ID}
-```
-![image](https://user-images.githubusercontent.com/5147735/109760887-dc3b1280-7c32-11eb-8284-f4544d7b72b0.png)
-
-
-## Deploy / Pipeline
-
-* build 하기
-```
-cd /forthcafe
-
-cd Order
-mvn package 
-
-cd ..
-cd Pay
-mvn package
-
-cd ..
-cd Delivery
-mvn package
-
-cd ..
-cd gateway
-mvn package
-
-cd ..
-cd MyPage
-mvn package
-```
-
-* Azure 레지스트리에 도커 이미지 push, deploy, 서비스생성(방법1 : yml파일 이용한 deploy)
-```
-cd .. 
-cd Order
-az acr build --registry skteam01 --image skteam01.azurecr.io/order:v1 .
+cd customercenter
+docker build -t team03skccacr.azurecr.io/fashionstore-customercenter:latest .
+docker push team03skccacr.azurecr.io/fashionstore-customercenter:latest
 kubectl apply -f kubernetes/deployment.yml 
-kubectl expose deploy order --type=ClusterIP --port=8080
+kubectl expose deploy customercenter --type=ClusterIP --port=8080
 
-cd .. 
-cd Pay
-az acr build --registry skteam01 --image skteam01.azurecr.io/pay:v1 .
-kubectl apply -f kubernetes/deployment.yml 
-kubectl expose deploy pay --type=ClusterIP --port=8080
-
-cd .. 
-cd Delivery
-az acr build --registry skteam01 --image skteam01.azurecr.io/delivery:v1 .
+cd ../delivery
+docker build -t team03skccacr.azurecr.io/fashionstore-delivery:latest .
+docker push team03skccacr.azurecr.io/fashionstore-delivery:latest
 kubectl apply -f kubernetes/deployment.yml 
 kubectl expose deploy delivery --type=ClusterIP --port=8080
 
-
-cd .. 
-cd MyPage
-az acr build --registry skteam01 --image skteam01.azurecr.io/mypage:v1 .
-kubectl apply -f kubernetes/deployment.yml 
-kubectl expose deploy mypage --type=ClusterIP --port=8080
-
-cd .. 
-cd gateway
-az acr build --registry skteam01 --image skteam01.azurecr.io/gateway:v1 .
-kubectl create deploy gateway --image=skteam01.azurecr.io/gateway:v1
+cd ../gateway
+docker build -t team03skccacr.azurecr.io/fashionstore-gateway:latest .
+docker push team03skccacr.azurecr.io/fashionstore-gateway:latest
+kubectl create deploy gateway --image=team03skccacr.azurecr.io/fashionstore-gateway:latest
 kubectl expose deploy gateway --type=LoadBalancer --port=8080
-```
 
-
-* Azure 레지스트리에 도커 이미지 push, deploy, 서비스생성(방법2)
-```
-cd ..
-cd Order
-az acr build --registry skteam01 --image skteam01.azurecr.io/order:v1 .
-kubectl create deploy order --image=skteam01.azurecr.io/order:v1
+cd ../order
+docker build -t team03skccacr.azurecr.io/fashionstore-order:latest .
+docker push team03skccacr.azurecr.io/fashionstore-order:latest
+kubectl apply -f kubernetes/deployment.yml 
 kubectl expose deploy order --type=ClusterIP --port=8080
 
-cd .. 
-cd Pay
-az acr build --registry skteam01 --image skteam01.azurecr.io/pay:v1 .
-kubectl create deploy pay --image=skteam01.azurecr.io/pay:v1
-kubectl expose deploy pay --type=ClusterIP --port=8080
+cd ../payment
+docker build -t team03skccacr.azurecr.io/fashionstore-payment:latest .
+docker push team03skccacr.azurecr.io/fashionstore-payment:latest
+kubectl apply -f kubernetes/deployment.yml 
+kubectl expose deploy payment --type=ClusterIP --port=8080
 
-
-cd .. 
-cd Delivery
-az acr build --registry skteam01 --image skteam01.azurecr.io/delivery:v1 .
-kubectl create deploy delivery --image=skteam01.azurecr.io/delivery:v1
-kubectl expose deploy delivery --type=ClusterIP --port=8080
-
-
-cd .. 
-cd gateway
-az acr build --registry skteam01 --image skteam01.azurecr.io/gateway:v1 .
-kubectl create deploy gateway --image=skteam01.azurecr.io/gateway:v1
-kubectl expose deploy gateway --type=LoadBalancer --port=8080
-
-cd .. 
-cd MyPage
-az acr build --registry skteam01 --image skteam01.azurecr.io/mypage:v1 .
-kubectl create deploy mypage --image=skteam01.azurecr.io/mypage:v1
-kubectl expose deploy mypage --type=ClusterIP --port=8080
-
-kubectl logs {pod명}
+cd ../product
+docker build -t team03skccacr.azurecr.io/fashionstore-product:latest .
+docker push team03skccacr.azurecr.io/fashionstore-product:latest
+kubectl apply -f kubernetes/deployment.yml 
+kubectl expose deploy product --type=ClusterIP --port=8080
 ```
-* Service, Pod, Deploy 상태 확인
-![image](https://user-images.githubusercontent.com/5147735/109769165-2de89a80-7c3d-11eb-8472-2281468fb771.png)
-
-
-* deployment.yml  참고
-```
-1. image 설정
-2. env 설정 (config Map) 
-3. readiness 설정 (무정지 배포)
-4. liveness 설정 (self-healing)
-5. resource 설정 (autoscaling)
-```
-
-![image](https://user-images.githubusercontent.com/5147735/109643506-a8f77580-7b97-11eb-926b-e6c922aa2d1b.png)
 
 ## 서킷 브레이킹
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
@@ -799,6 +679,30 @@ kubectl get pod
 * 배포후
 
 ![image](https://user-images.githubusercontent.com/5147735/109744225-45139200-7c15-11eb-8efa-07ac40162ded.png)
+
+
+## Config Map
+* deployment.yml 파일에 아래와 가팅 Config Map을 설정
+```
+env:
+   - name: SYSENV
+     valueFrom:
+       configMapKeyRef:
+         name: envkind
+         key: kindkey
+```
+* Configmap 을 생성하고 제대로 생성되었는지를 확인
+```
+kubectl create configmap envkind --from-literal=kindkey=PROD
+kubectl get configmap envkind -o yaml
+```
+<이미지 넣을 것>
+
+* delivery 에 Configmap 설정하고 로그가 생성된 것을 확인
+```
+kubectl logs {pod ID}
+```
+<이미지 위치>
 
 
 
