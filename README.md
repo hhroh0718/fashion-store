@@ -611,7 +611,7 @@ siege -c1 -t60S  -v --content-type "application/json" 'http://52.231.76.246:8080
 
 
 ## Config Map
-* deployment.yml 파일에 아래와 가팅 Config Map을 설정
+* deployment.yml 파일에 아래와 같이 Config Map을 설정
 ```
 env:
    - name: SYSENV
@@ -625,9 +625,10 @@ env:
 kubectl create configmap envkind --from-literal=kindkey=PROD
 kubectl get configmap envkind -o yaml
 ```
-<이미지 넣을 것>
+![50](https://user-images.githubusercontent.com/32154210/122498444-1685bf80-d02a-11eb-8e22-927cd335730f.PNG)
 
-* delivery 에 Configmap 설정하고 로그가 생성된 것을 확인
+
+* delivery 에 Config 설정하고 로그가 생성된 것을 확인
 ```
 kubectl logs {pod ID}
 ```
