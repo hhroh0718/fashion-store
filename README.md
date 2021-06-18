@@ -35,8 +35,7 @@
 ![modeling](https://user-images.githubusercontent.com/84000864/122414542-308bb780-cfc2-11eb-9a79-fe258fcf6acf.PNG)
 
 ### 기능/비기능 요구사항 검증
-![image](https://user-images.githubusercontent.com/85218591/122432104-004b1580-cfd0-11eb-9dc5-9b139e49b867.png)
-
+![image](https://user-images.githubusercontent.com/85218591/122488649-dd911f00-d018-11eb-8304-bf2b2061e03f.png)
 
 # 헥사고날 아키텍처 다이어그램 도출
 ![image](https://user-images.githubusercontent.com/85218591/122488385-55127e80-d018-11eb-8124-1e2a040d7efa.png)
