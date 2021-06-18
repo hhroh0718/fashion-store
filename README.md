@@ -95,7 +95,7 @@ public class Order {
     private String size;
     private String status;
     private Long price;
-
+ 
     @PostPersist
     public void onPostPersist(){
     
@@ -316,7 +316,7 @@ Order 서비스의 DB와 Payment의 DB를 다른 DB를 사용하여 폴리글랏
 
 **Payment의 pom.xml DB 설정 코드**
 
-![image](https://user-images.githubusercontent.com/84000933/122423929-42bd2400-cfc9-11eb-8258-130d4203f4f9.png)
+![image](https://user-images.githubusercontent.com/84000933/122492864-893e6d00-d021-11eb-9eab-36977c4c80a4.png)
 
 # 동기식 호출 과 Fallback 처리
 
