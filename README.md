@@ -291,9 +291,10 @@ server:
 # CQRS/saga/correlation
 Materialized View를 구현하여, 타 마이크로서비스의 데이터 원본에 접근없이(Composite 서비스나 조인SQL 등 없이)도 내 서비스의 화면 구성과 잦은 조회가 가능하게 모델링하였다.
 
-![image](https://user-images.githubusercontent.com/84000933/122491613-48ddef80-d01f-11eb-925a-6e293cba37cf.png)
+![image](https://user-images.githubusercontent.com/84000933/122500927-acbbe480-d02e-11eb-8e4f-715762f6f2b4.png)
 
 Order, Payment, Delivery 등 서비스의 전체 현황 및 상태 조회를 제공하기 위해 주문 서비스 내에 Dashboards View를 모델링 하였다.
+
 ![image](https://user-images.githubusercontent.com/84000933/122491834-aeca7700-d01f-11eb-8ce6-97ecbe42ba09.png)
 
 Order가 생성될 때 Dashboard 데이터도 생성되고, 이후 "결제 완료", "주문취소", "배송시작", "배송취소" 등의 이벤트에 따라 주문상태 및 배송상태를 수정하도록 모델링하였다. 
