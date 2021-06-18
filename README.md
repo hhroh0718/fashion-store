@@ -569,70 +569,25 @@ siege -c100 -t60S  -v --content-type "application/json" 'http://52.231.76.246:80
 ![26](https://user-images.githubusercontent.com/32154210/122491797-9bb7a700-d01f-11eb-8892-28fe8bc800a7.PNG)
 
 
+## Autoscale (HPA)
+* 서킷 브레이커(CB) 는 down되는 장애를 줄여 줄 수 있지만 사용자의 요청을 다 수용하지 못하고, 일부 Fail이 발생하므로, 보다 안정적인 서비스를 위해 시스템 부하시 자동으로 확장되는 Autoscailing 을 적용하였음
 
-## 오토스케일 아웃
-* 앞서 서킷 브레이커(CB) 는 시스템을 안정되게 운영할 수 있게 해줬지만 사용자의 요청을 100% 받아들여주지 못했기 때문에 이에 대한 보완책으로 자동화된 확장 기능을 적용하고자 한다.
+* 테스트를 위해 Order 서비스의 deployment.yml 에 리소스 제한을 설정한 모습
+![14](https://user-images.githubusercontent.com/32154210/122492173-429c4300-d020-11eb-8d96-bab5c5d66239.PNG)
 
-* order 서비스 deployment.yml 설정
-```
- resources:
-            limits:
-              cpu: 500m
-            requests:
-              cpu: 200m
-```
-* 다시 배포해준다.
-```
-/home/project/team/forthcafe/Order/mvn package
-az acr build --registry skteam01 --image skteam01.azurecr.io/order:v1 .
-kubectl apply -f kubernetes/deployment.yml 
-kubectl expose deploy order --type=ClusterIP --port=8080
-```
+* Order 서비스를 다시 배포하고 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 20%를 넘어서면 replica 를 5개까지 늘려준다
+![15](https://user-images.githubusercontent.com/32154210/122492322-82632a80-d020-11eb-910f-e8c4a056e0c0.PNG)
 
-* Order 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다
+* siege 서비스를 사용하여 500의 User가 60초 동안 부하를 준다. 
+![24](https://user-images.githubusercontent.com/32154210/122492972-c86cbe00-d021-11eb-80f8-b3b3bae72171.PNG)
 
-```
-kubectl autoscale deploy order --min=1 --max=10 --cpu-percent=15
-```
-
-* /home/project/team/forthcafe/yaml/siege.yaml
-```
-apiVersion: v1
-kind: Pod
-metadata:
-  name: siege
-spec:
-  containers:
-  - name: siege
-    image: apexacme/siege-nginx
-```
-
-* siege pod 생성
-```
-/home/project/team/forthcafe/yaml/kubectl apply -f siege.yaml
-```
-
-* siege를 활용해서 워크로드를 1000명, 1분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
-```
-kubectl exec -it pod/siege -c siege -- /bin/bash
-siege -c1000 -t60S  -v --content-type "application/json" 'http://{EXTERNAL-IP}:8080/orders POST {"memuId":2, "quantity":1}'
-siege -c1000 -t60S  -v --content-type "application/json" 'http://52.141.61.164:8080/orders POST {"memuId":2, "quantity":1}'
-```
-
-* 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다
-```
-kubectl get deploy order -w
-```
-![image](https://user-images.githubusercontent.com/5147735/109771563-4c9c6080-7c40-11eb-9bf8-1efef17bedee.png)
-```
-kubectl get pod
-```
-![image](https://user-images.githubusercontent.com/5147735/109771259-f3ccc800-7c3f-11eb-8ebe-9ff4ab9c2242.png)
+* Autoscale 이 작동하여 확장되고 있는 상태와 최종 5개 pod가 생성된 모습
+![43](https://user-images.githubusercontent.com/32154210/122493168-2b5e5500-d022-11eb-986d-68e82fb353ba.PNG)
+![27](https://user-images.githubusercontent.com/32154210/122493227-44670600-d022-11eb-9349-526200f8377f.PNG)
 
 
 
-
-## 무정지 재배포 (Readiness Probe)
+## Zero-downtime deploy (Readiness Probe)
 * 배포전
 
 ![image](https://user-images.githubusercontent.com/5147735/109743733-89526280-7c14-11eb-93da-0ddd3cd18e22.png)
