@@ -19,6 +19,13 @@ spec:
           image: team03skccacr.azurecr.io/fashionstore-delivery:latest
           ports:
             - containerPort: 8080
+          ## Configmap
+          env:
+            - name: SYSENV
+              valueFrom:
+                configMapKeyRef:
+                  name: envkind
+                  key: kindkey
           readinessProbe:
             httpGet:
               path: '/actuator/health'
