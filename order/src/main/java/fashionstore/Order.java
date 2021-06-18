@@ -32,6 +32,7 @@ public class Order {
         if (rslt) {
 
             Ordered ordered = new Ordered();
+            this.setStatus("Ordered");
             BeanUtils.copyProperties(this, ordered);
             System.out.println("########### Before Order Publish...!! #######");
             ordered.publishAfterCommit();
