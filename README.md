@@ -1,4 +1,4 @@
-# Ticket-Box
+# Fashion-Store
 ![image](https://user-images.githubusercontent.com/84000933/122435289-d810e600-cfd2-11eb-85ab-ba035027619b.png)
 # 서비스 시나리오
 ### 기능적 요구사항
